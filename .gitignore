@@ -1,3 +1,7 @@
+data/
+*.mat
+*.asv
+
 # Prerequisites
 *.d
 
