@@ -1,8 +1,12 @@
 
-function plotVoxel(fig, filename)
+function pts_norm = plotVoxel(fig, pts, ix, iy ,iz, min_x, min_y, min_z, voxel_size)
     figure(fig);
-    load(filename);
-    pts_norm = pts - [ix-0.5, iy-0.5, iz-0.5]*voxel_size - [min_x, min_y, min_z];
+    if(nargin == 9)
+        pts_norm = pts - [ix-0.5, iy-0.5, iz-0.5]*voxel_size - [min_x, min_y, min_z];
+    else
+        pts_norm = pts;
+        voxel_size = 0.5;
+    end
     plot3(pts_norm(:,1), pts_norm(:,2), pts_norm(:,3), 'k.', "MarkerSize", 20);
     
     % title(num2str(planarity));
@@ -15,9 +19,9 @@ function plotVoxel(fig, filename)
     view([25,30]);
 
     % 隐藏坐标轴刻度标签
-    set(gca, 'XTickLabel', []); % 隐藏 X 轴标签
-    set(gca, 'YTickLabel', []); % 隐藏 Y 轴标签
-    set(gca, 'ZTickLabel', []); % 隐藏 Z 轴标签
+    % set(gca, 'XTickLabel', []); % 隐藏 X 轴标签
+    % set(gca, 'YTickLabel', []); % 隐藏 Y 轴标签
+    % set(gca, 'ZTickLabel', []); % 隐藏 Z 轴标签
     
     % lidar_points = pts;
 end

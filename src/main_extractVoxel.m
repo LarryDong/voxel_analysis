@@ -1,32 +1,40 @@
 
+% 对一个ply文件提取点云，然后分隔到各个voxel中。保存到mat
 clc;clear;close all;
 
+ply_name = "TUHH-p1";           % TUHH-p1, terrain-p1, corridor
+voxel_size = 0.5; % 体素大小
+
+% 每个voxel最少有多少个点？corridor目前采用15。手持扫描仪：300。TUHH：250
+minimal_points_threshold = 250;
+
 %% load point cloud.
-% filename = "../data/MANIFOLD_MT20240926-150435-Cloud.ply";
-filename = "../data/corridor.ply";
+filename = "../data/"+ply_name+".ply";
 fprintf("--> Loading ply file from: %s \n", filename);
 ptCloud = pcread(filename);
 fprintf("<-- Loaded. \n");
+lidar_pos = ptCloud.Location;
+
 % pcshow(ptCloud);
 
 % downsample the point cloud if necessary.
 % ptCloud = pcdownsample(ptCloud, 'gridAverage', 0.05);
 % fprintf("--> Total points: %d \n", ptCloud.Count);
 
-lidar_pos = ptCloud.Location;
+% 存储到mat
 fprintf("--> Saving Lidar position. \n");
-save("pointcloud.mat", "lidar_pos");
+save("pointcloud_"+ply_name+".mat", "lidar_pos");
 fprintf("<-- Done. \n");
 
-fprintf("--> Loading lidar pos from mat. \n");
-load("pointcloud.mat");
-fprintf("<-- Done. \n");
+% 从mat载入
+% fprintf("--> Loading lidar pos from mat. \n");
+% load("pointcloud_"+ply_name+".mat");
+% fprintf("<-- Done. \n");
+
+
 
 %% segment the voxel.
 fprintf("--> Segment the point into voxels. \n");
-
-voxel_size = 0.5; % 体素大小
-minimal_points_threshold = 15;          % 每个voxel最少有多少个点？
 
 min_x = min(lidar_pos(:, 1));
 min_y = min(lidar_pos(:, 2));
@@ -56,9 +64,9 @@ end
 fprintf("\n <-- Done. Total voxel: %d, %d, %d \n", size(voxels));
 
 % save into folder.
-folder = "./voxel_terrain";
-if ~exist(folder, 'dir')
-    mkdir(folder);
+output_folder =  "voxels/"+ply_name;
+if ~exist(output_folder, 'dir')
+    mkdir(output_folder);
     fprintf("--> Folder not exist. Create. \n");
 end
 
@@ -74,7 +82,7 @@ for ix = 1:voxel_count_x
             if (size(pts, 1) < minimal_points_threshold)
                 continue;
             end
-            filename = sprintf('%s/%d.mat', folder, index);
+            filename = sprintf('%s/%d.mat', output_folder, index);
             index = index + 1;
             save(filename, "pts", "ix", "iy", "iz", "min_x", "min_y", "min_z", "max_x", "max_y", "max_z", "voxel_size");
         end
